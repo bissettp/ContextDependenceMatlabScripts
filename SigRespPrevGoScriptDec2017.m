@@ -95,28 +95,29 @@ plot(OnlySSDsUsedForAverage(:, 1), meanNoStopScatterplotY, 'g', 'LineWidth', 4)
 xlabel('SSD')
 ylabel('RT (blue=individualSF, red=meanSF, green=precedingNS)')
 
-%Create a cumulative frequency distribution for each subject at each SSD
-%that includes sig-resp RT and no-stop-signal RT that precedes sig-resp. 
-
 SortedSigRespOutput = sort(SigRespOutput, 1);
 SortedNoStopOutput = sort(NoStopOutput, 1); 
 
-for i=1:NumberOfSSDs
-    for f=1:(size(SubjectNum))
-        k = 0; 
-        for j=1:size(SigRespOutput, 1)
-            if(isnan(SigRespOutput(j, i, f))) == 0;
-                k = k + 1;
-            else
-                break; 
-            end  
-        end
-        figure
-        plot(SortedSigRespOutput(1:k, i, f), 1:k, 'r')  
-        hold on;
-        plot(SortedNoStopOutput(1:k, i, f), 1:k, 'g')  
-    end
-end
+
+%Create a cumulative frequency distribution for each subject at each SSD
+%that includes sig-resp RT and no-stop-signal RT that precedes sig-resp.
+%Commented this out bc it was crashing my Matlab
+% for i=1:NumberOfSSDs
+%     for f=1:(size(SubjectNum))
+%         k = 0; 
+%         for j=1:size(SigRespOutput, 1)
+%             if(isnan(SigRespOutput(j, i, f))) == 0;
+%                 k = k + 1;
+%             else
+%                 break; 
+%             end  
+%         end
+%         figure
+%         plot(SortedSigRespOutput(1:k, i, f), 1:k, 'r')  
+%         hold on;
+%         plot(SortedNoStopOutput(1:k, i, f), 1:k, 'g')  
+%     end
+% end
                 
     
 %Produce a scatterplot of GoRT and SSD over time for each subject, only
