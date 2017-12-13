@@ -8,7 +8,7 @@ clear all
 %column
 [SubjectNum MeanRT] = textread('B&L20112up1downMeanRT.txt', '%f%f');
 
-SigRespCountCutoff = 2; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
+SigRespCountCutoff = 5; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
 MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
 
 %Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
@@ -36,8 +36,7 @@ end
 NoStopOutput(NoStopOutput==0) = NaN;
 SigRespOutput(SigRespOutput==0) = NaN;
 
-%Create a graph showing signal-respond RT over SSD and no-stop-signal
-%trials that immediately precede signal-respond trials RT across SSD
+%Finds the mean sig-resp RT and mean preceding no-stop RT for each subject at each SSD in which they have >= SigRespCountCutoff number of signal-respond trials
 for f=1:(size(SubjectNum, 1))
     SubjectNumber2 = SubjectNum(f);
     h = 1; 
@@ -57,25 +56,20 @@ for f=1:(size(SubjectNum, 1))
     end
 end
 
-%for m=1:(size(SubjectNum, 1))
-%    for n=1:NumberOfSSDs
-%        GoMinusSSD(n, m) = MeanRT(m) - NoStopScatterplotX(n, m);
-%    end
-%end
-
+%Excludes SSDs from the grand mean averages for which there are fewer than
+%MinimumSubjectsForAverage numbers of subjects at that SSD that had >=
+%SigrespCountCutoff number of signal-respond trials. 
 for l=1:NumberOfSSDs
     FullSSDList(l, 1) = SSDMin+(l-1)*50;
     if sum(isnan(NoStopScatterplotY(l, :))) <= size(SubjectNum, 1) - MinimumSubjectsForAverage
-        OnlySSDsUsedForAverage(l, 1) = SSDMin+(l-1)*50;
-%        GoMinusSSDMean(l, 1) = nanmean(GoMinusSSD(l, :)); 
+        OnlySSDsUsedForAverage(l, 1) = SSDMin+(l-1)*50; 
         meanNoStopScatterplotY(l, 1) = nanmean(NoStopScatterplotY(l, :));
         meanSigRespScatterplotY(l, 1) = nanmean(SigRespScatterplotY(l, :));
         NoSigMinusSigResp = meanNoStopScatterplotY - meanSigRespScatterplotY;
     end
 end
 
-%GoMinusSSDMean(GoMinusSSDMean==0) = NaN;
-meanNoStopScatterplotY( meanNoStopScatterplotY==0) = NaN;
+meanNoStopScatterplotY(meanNoStopScatterplotY==0) = NaN;
 meanSigRespScatterplotY(meanSigRespScatterplotY==0) = NaN;
 NoSigMinusSigResp(NoSigMinusSigResp==0) = NaN;
 
@@ -101,22 +95,6 @@ plot(OnlySSDsUsedForAverage(:, 1), meanNoStopScatterplotY, 'g', 'LineWidth', 4)
 xlabel('SSD')
 ylabel('RT (blue=individualSF, red=meanSF, green=precedingNS)')
 
-% figure; 
-% for f=1:(size(SubjectNum, 1))
-%     plot(GoMinusSSD(:, f), (NoStopScatterplotY(:, f) - (SigRespScatterplotY(:, f))), 'b')
-%     hold on; 
-% end
-% 
-% plot(GoMinusSSDMean(:, 1), NoSigMinusSigResp, 'r')
-% xlabel('OverallMeanNoStopRT-SSD')
-% ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
-% 
-% figure; 
-% for f=1:(size(SubjectNum, 1))
-%     plot(GoMinusSSD(:, f), SigRespScatterplotY(:, f), 'b')
-%     hold on; 
-% end
-% 
 % plot(GoMinusSSDMean(:, 1), meanSigRespScatterplotY, 'r')
 % hold on; 
 % plot(GoMinusSSDMean(:, 1), meanNoStopScatterplotY, 'g')
@@ -182,58 +160,58 @@ SortedNoStopOutput = sort(NoStopOutput, 1);
 %     scatter(GoRTScatterplotX(:, ff), GoRTScatterplotY(:, ff), 'g')
 % end
 
-% % Create a SSDCount x SSD x subj matrix of go RTs that immediately precede
-% % stop trials and a sig-resp count x SSD x subj matrix of signal-respond
-% % trials
-%  for t=1:(size(SubjectNum))
-%     w = SSDMin;
-%     for u=1:(size(SSDCount,1))
-%         x=1;
-%         cc=1;
-%         for v=2:(size(SubjectSeq))
-%             if(w == SSDSeq(v)) && GoRTSeq(v-1) > 0 && Block(v) == Block(v-1) && SubjectSeq(v) == SubjectNum(t)
-%                 GoRTMinus1(x, u, t) = GoRTSeq(v-1);
-%                 x = x + 1;
-%             end
-%             if(w == SSDSeq(v)) && SigRespRT(v) > 0 && SubjectSeq(v) == SubjectNum(t)
-%                 SigRespRTList(cc, u, t) = SigRespRT(v);
-%                 cc = cc + 1;
-%             end
-%         end
-%     w = w + 50;
-%     end
-%  end
+% Create a SSDCount x SSD x subj matrix of go RTs that immediately precede
+% stop trials and a sig-resp count x SSD x subj matrix of signal-respond
+% trials
+ for t=1:(size(SubjectNum))
+    w = SSDMin;
+    for u=1:(size(SSDCount,1))
+        x=1;
+        cc=1;
+        for v=2:(size(SubjectSeq))
+            if(w == SSDSeq(v)) && GoRTSeq(v-1) > 0 && Block(v) == Block(v-1) && SubjectSeq(v) == SubjectNum(t)
+                GoRTMinus1(x, u, t) = GoRTSeq(v-1);
+                x = x + 1;
+            end
+            if(w == SSDSeq(v)) && SigRespRT(v) > 0 && SubjectSeq(v) == SubjectNum(t)
+                SigRespRTList(cc, u, t) = SigRespRT(v);
+                cc = cc + 1;
+            end
+        end
+    w = w + 50;
+    end
+ end
 
-% % Create stop trial number x N Matrix
-% for b=1:(size(SubjectNum))
-%     SubjectNumber = SubjectNum(b);
-%     for c = 1:(size(SSD))
-%         if (SubjectNumber == SubjectSSD(c))
-%             SSDOut(a, b) = SSD(c);
-%             a = a + 1;
-%         end
-%     end
-%     a = 1;
-% end
-% 
-% %Sort stop trial number x N Matrix of SSD by descending SSDs
-% SSDFinal = sort(SSDOut, 1);
-% 
-% % Creates a SSDRange x N Matrix that counts the number of trials at each
-% % SSD for each subjects. Named SSDCount
-% for e=1:(size(SubjectNum))
-%     for g=SSDMin:50:SSDMax
-%         for f=1:(size(SSDFinal, 1))
-%             if(g == SSDFinal(f, e));
-%                 h = h + 1;
-%             end
-%         end
-%         SSDCount(i, e) = h;
-%         i = i + 1;
-%         h = 0; 
-%     end
-%     i=1;
-% end
+% Create stop trial number x N Matrix
+for b=1:(size(SubjectNum))
+    SubjectNumber = SubjectNum(b);
+    for c = 1:(size(SSD))
+        if (SubjectNumber == SubjectSSD(c))
+            SSDOut(a, b) = SSD(c);
+            a = a + 1;
+        end
+    end
+    a = 1;
+end
+
+%Sort stop trial number x N Matrix of SSD by descending SSDs
+SSDFinal = sort(SSDOut, 1);
+
+% Creates a SSDRange x N Matrix that counts the number of trials at each
+% SSD for each subjects. Named SSDCount
+for e=1:(size(SubjectNum))
+    for g=SSDMin:50:SSDMax
+        for f=1:(size(SSDFinal, 1))
+            if(g == SSDFinal(f, e));
+                h = h + 1;
+            end
+        end
+        SSDCount(i, e) = h;
+        i = i + 1;
+        h = 0; 
+    end
+    i=1;
+end
 % 
 % %Sorts SSDCount Matrix from most to least frequent SSDs for each subject (Sorted SSDs).
 % %Index for the corresponding SSD in SortedSSDIndeces. Then finds the
