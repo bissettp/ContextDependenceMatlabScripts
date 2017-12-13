@@ -8,14 +8,14 @@ clear all
 %column
 [SubjectNum MeanRT] = textread('B&L20112up1downMeanRT.txt', '%f%f');
 
-%Change these to correspond to the study
-SSDMin = -400;
-SSDMax = 700;
-%plottedSSDMin = -425;
-%plottedSSDMax = 1525;
-SigRespCountCutoff = 2; 
-NumberOfSSDs = 23;
-MinimumSubjectsForAverage = 5; 
+SigRespCountCutoff = 2; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
+MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
+
+%Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
+%the SSD distribution
+SSDMin = min(SSDSeq(SSDSeq > -500));
+SSDMax = max(SSDSeq);
+NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kludge mentioned above 
 
 for a=1:(size(SubjectNum, 1))
     SubjectNumber = SubjectNum(a);
