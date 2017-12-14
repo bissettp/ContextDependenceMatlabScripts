@@ -4,9 +4,6 @@ clear all
 %column, SSD in 4th column, sig-resp RT in 5th column. Replace non-numbers in columns 3, 4, and 5 with a number
 %below the SSD min (I usually use -500). This kludge seems to work
 [SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('B&L20112up1downSigResp&PrecedingRT.txt', '%f%f%f%f%f');
-%Subject Numbers in first column, mean go RT excluding omissions in second
-%column
-[SubjectNum MeanRT] = textread('B&L20112up1downMeanRT.txt', '%f%f');
 
 SigRespCountCutoff = 5; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
 MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
@@ -16,8 +13,9 @@ MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass t
 SSDMin = min(SSDSeq(SSDSeq > -500));
 SSDMax = max(SSDSeq);
 NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kludge mentioned above 
+SubjectNum = unique(SubjectSeq); %create a list of unique subject numbers
 
-for a=1:(size(SubjectNum, 1))
+for a=1:(size(SubjectNum))
     SubjectNumber = SubjectNum(a);
     d = 1; 
     for c=SSDMin:50:SSDMax
@@ -37,7 +35,7 @@ NoStopOutput(NoStopOutput==0) = NaN;
 SigRespOutput(SigRespOutput==0) = NaN;
 
 %Finds the mean sig-resp RT and mean preceding no-stop RT for each subject at each SSD in which they have >= SigRespCountCutoff number of signal-respond trials
-for f=1:(size(SubjectNum, 1))
+for f=1:(size(SubjectNum))
     SubjectNumber2 = SubjectNum(f);
     h = 1; 
     for g=SSDMin:50:SSDMax
@@ -61,7 +59,7 @@ end
 %SigrespCountCutoff number of signal-respond trials. 
 for l=1:NumberOfSSDs
     FullSSDList(l, 1) = SSDMin+(l-1)*50;
-    if sum(isnan(NoStopScatterplotY(l, :))) <= size(SubjectNum, 1) - MinimumSubjectsForAverage
+    if sum(isnan(NoStopScatterplotY(l, :))) <= size(SubjectNum) - MinimumSubjectsForAverage
         OnlySSDsUsedForAverage(l, 1) = SSDMin+(l-1)*50; 
         meanNoStopScatterplotY(l, 1) = nanmean(NoStopScatterplotY(l, :));
         meanSigRespScatterplotY(l, 1) = nanmean(SigRespScatterplotY(l, :));
@@ -74,7 +72,7 @@ meanSigRespScatterplotY(meanSigRespScatterplotY==0) = NaN;
 NoSigMinusSigResp(NoSigMinusSigResp==0) = NaN;
 
 figure;
-for f=1:(size(SubjectNum, 1))
+for f=1:(size(SubjectNum))
     plot(NoStopScatterplotX(:, f), (NoStopScatterplotY(:, f) - (SigRespScatterplotY(:, f))), 'b')
     hold on; 
 end
@@ -84,7 +82,7 @@ xlabel('SSD')
 ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
 
 figure; 
-for f=1:(size(SubjectNum, 1))
+for f=1:(size(SubjectNum))
     plot(SigRespScatterplotX(:, f), SigRespScatterplotY(:, f), 'b')
     hold on; 
 end
