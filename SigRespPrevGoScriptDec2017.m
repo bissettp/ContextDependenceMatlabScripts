@@ -3,7 +3,7 @@ clear all
 %Subject number in first column, block number in 2nd column, go RT in 3rd
 %column, SSD in 4th column, sig-resp RT in 5th column. Replace non-numbers in columns 3, 4, and 5 with a number
 %below the SSD min (I usually use -500). This kludge seems to work
-[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('B&L20112up1downSigResp&PrecedingRT.txt', '%f%f%f%f%f');
+[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsBtwnSubjModalityAud1.txt', '%f%f%f%f%f');
 
 SigRespCountCutoff = 5; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
 MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
