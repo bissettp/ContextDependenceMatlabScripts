@@ -3,17 +3,19 @@ clear all
 %Subject number in first column, block number in 2nd column, go RT in 3rd
 %column, SSD in 4th column, sig-resp RT in 5th column. Replace non-numbers in columns 3, 4, and 5 with a number
 %below the SSD min (I usually use -500). This kludge seems to work
-[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsTurkMotorSelec.txt', '%f%f%f%f%f');
+[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsTurkStimSelec.txt', '%f%f%f%f%f');
 
-SigRespCountCutoff = 4; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
-MinimumSubjectsForAverage = 4; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
+SigRespCountCutoff = 3; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
+MinimumSubjectsForAverage = 3; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
 
 %Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
 %the SSD distribution
 SSDMin = min(SSDSeq(SSDSeq > -500)); %change to a number below the minimum SSD
 SSDMax = max(SSDSeq);
 NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kludge mentioned above 
-SubjectNum = unique(SubjectSeq); %create a list of unique subject numbers
+%SubjectNum = unique(SubjectSeq); %create a list of unique subject numbers
+[SubjectNum] = textread('TurkN339.txt', '%f'); % can load in a subset of subject numbers here, as is necessary for our
+% Turk data
 
 NoStopOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
 SigRespOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
@@ -76,7 +78,7 @@ NoSigMinusSigResp(NoSigMinusSigResp==0) = NaN;
 
 figure;
 for f=1:(size(SubjectNum, 1))
-    plot(NoStopScatterplotX(:, f), (NoStopScatterplotY(:, f) - (SigRespScatterplotY(:, f))), 'b', 'LineWidth', 8)
+    scatter(NoStopScatterplotX(:, f), (NoStopScatterplotY(:, f) - (SigRespScatterplotY(:, f))), 'b')
     hold on; 
 end
 
@@ -86,7 +88,7 @@ ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
 
 figure; 
 for f=1:(size(SubjectNum, 1))
-    plot(SigRespScatterplotX(:, f), SigRespScatterplotY(:, f), 'b')
+    scatter(SigRespScatterplotX(:, f), SigRespScatterplotY(:, f), 'b')
     hold on; 
 end
 
