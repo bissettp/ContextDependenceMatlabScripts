@@ -18,10 +18,10 @@ NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kl
 % Turk data
 SSDRequired = [150 200 250 300]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
 
-NoStopOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
-SigRespOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
+NoStopOutput = zeros(1, NumberOfSSDs, length(SubjectNum));
+SigRespOutput = zeros(1, NumberOfSSDs, length(SubjectNum));
 
-for a=1:(size(SubjectNum, 1))
+for a=1:(length(SubjectNum))
     SubjectNumber = SubjectNum(a);
     d = 1;
     for c=SSDMin:50:SSDMax 
@@ -41,7 +41,7 @@ NoStopOutput(NoStopOutput==0) = NaN;
 SigRespOutput(SigRespOutput==0) = NaN;
 
 %Finds the mean sig-resp RT and mean preceding no-stop RT for each subject at each SSD in which they have >= SigRespCountCutoff number of signal-respond trials
-for f=1:(size(SubjectNum, 1))
+for f=1:(length(SubjectNum))
     SubjectNumber2 = SubjectNum(f);
     h = 1; 
     for g=SSDMin:50:SSDMax
@@ -60,24 +60,41 @@ for f=1:(size(SubjectNum, 1))
     end
 end
 
-SigRespScatterplotYRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
-SigRespScatterplotXRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
-NoStopScatterplotYRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
-NoStopScatterplotXRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
+SigRespScatterplotYRequired = zeros(length(SSDRequired), length(SubjectNum));
+SigRespScatterplotXRequired = zeros(length(SSDRequired), length(SubjectNum));
+NoStopScatterplotYRequired = zeros(length(SSDRequired), length(SubjectNum));
+NoStopScatterplotXRequired = zeros(length(SSDRequired), length(SubjectNum));
 
-for j=1:(size(SubjectNum, 1))
+for j=1:(length(SubjectNum))
     if(mean(ismember(SSDRequired(:), NoStopScatterplotX(:, j))) == 1);
-        SigRespScatterplotYRequired(:, j) = SigRespScatterplotY(:, j);
-        SigRespScatterplotXRequired(:, j) = SigRespScatterplotX(:, j);
-        NoStopScatterplotYRequired(:, j) = NoStopScatterplotY(:, j);
-        NoStopScatterplotXRequired(:, j) = NoStopScatterplotX(:, j);
-    else
-        SigRespScatterplotYRequired(:, j) = NaN;
-        SigRespScatterplotXRequired(:, j) = NaN;
-        NoStopScatterplotYRequired(:, j) = NaN;
-        NoStopScatterplotXRequired(:, j) = NaN;           
+        q = 1;
+        for p=SSDMin:50:SSDMax
+            r = 1; 
+            for o=min(SSDRequired):50:max(SSDRequired)
+                if(SigRespScatterplotX(q, j)) == o
+                    SigRespScatterplotYRequired(r, j) = SigRespScatterplotY(q, j);
+                    SigRespScatterplotXRequired(r, j) = SigRespScatterplotX(q, j);
+                    NoStopScatterplotYRequired(r, j) = NoStopScatterplotY(q, j);
+                    NoStopScatterplotXRequired(r, j) = NoStopScatterplotX(q, j);
+                end
+            end
+            r = r + 1; 
+        end
+        q = q + 1; 
     end
-end
+end 
+%             if(SigRespScatterplotX(
+%         SigRespScatterplotYRequired(:, j) = SigRespScatterplotY(:, j);
+%         SigRespScatterplotXRequired(:, j) = SigRespScatterplotX(:, j);
+%         NoStopScatterplotYRequired(:, j) = NoStopScatterplotY(:, j);
+%         NoStopScatterplotXRequired(:, j) = NoStopScatterplotX(:, j);
+%     else
+%         SigRespScatterplotYRequired(:, j) = NaN;
+%         SigRespScatterplotXRequired(:, j) = NaN;
+%         NoStopScatterplotYRequired(:, j) = NaN;
+%         NoStopScatterplotXRequired(:, j) = NaN;           
+%     end
+% end
 
 
 %Excludes SSDs from the grand mean averages for which there are fewer than
@@ -85,7 +102,7 @@ end
 %SigrespCountCutoff number of signal-respond trials. 
 for l=1:NumberOfSSDs
     FullSSDList(l, 1) = SSDMin+(l-1)*50;
-    if sum(isnan(NoStopScatterplotY(l, :))) <= size(SubjectNum, 1) - MinimumSubjectsForAverage
+    if sum(isnan(NoStopScatterplotY(l, :))) <= length(SubjectNum) - MinimumSubjectsForAverage
         OnlySSDsUsedForAverage(l, 1) = SSDMin+(l-1)*50; 
         meanNoStopScatterplotY(l, 1) = nanmean(NoStopScatterplotY(l, :));
         meanSigRespScatterplotY(l, 1) = nanmean(SigRespScatterplotY(l, :));
@@ -98,7 +115,7 @@ meanSigRespScatterplotY(meanSigRespScatterplotY==0) = NaN;
 NoSigMinusSigResp(NoSigMinusSigResp==0) = NaN;
 
 figure;
-for f=1:(size(SubjectNum, 1))
+for f=1:(length(SubjectNum))
     scatter(NoStopScatterplotX(:, f), (NoStopScatterplotY(:, f) - (SigRespScatterplotY(:, f))), 'b')
     hold on; 
 end
@@ -108,7 +125,7 @@ xlabel('SSD')
 ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
 
 figure; 
-for f=1:(size(SubjectNum, 1))
+for f=1:(length(SubjectNum))
     scatter(SigRespScatterplotX(:, f), SigRespScatterplotY(:, f), 'b')
     hold on; 
 end
@@ -120,37 +137,37 @@ xlabel('SSD')
 ylabel('RT (blue=individualSF, red=meanSF, green=precedingNS)')
 
 figure;
-for m=1:(size(SubjectNum, 1))
+for m=1:(length(SubjectNum))
     if(ismember(SSDRequired(1), NoStopScatterplotXRequired(:, m)));
         scatter(NoStopScatterplotXRequired(:, m), (NoStopScatterplotYRequired(:, m) - (SigRespScatterplotYRequired(:, m))), 'b')
     hold on; 
     end
 end
 
-n = 1; 
-for o=min(SSDRequired):50:max(SSDRequired)
-    meanNoStopScatterplotYRequired(o) = nanmean(NoStopScatterplotYRequired(n, :));
-    meanNoStopScatterplotXRequired(o) = nanmean(NoStopScatterplotXRequired(n, :));
-    meanSigRespScatterplotYRequired(o) = nanmean(SigRespScatterplotYRequired(n, :));
-    meanSigRespScatterplotXRequired(o) = nanmean(SigRespScatterplotXRequired(n, :));
-    if(isnan(NoStopOutput(SigRespCountCutoff, h, f))) == 0;
-        SigRespScatterplotY(h, f) = (nanmean(SigRespOutput(:, h, f)));
-        SigRespScatterplotX(h, f) = g;
-        NoStopScatterplotY(h, f) = (nanmean(NoStopOutput(:, h, f)));
-        NoStopScatterplotX(h, f) = g;
-    else
-        SigRespScatterplotY(h, f) = NaN;
-        SigRespScatterplotX(h, f) = NaN;
-        NoStopScatterplotY(h, f) = NaN;
-        NoStopScatterplotX(h, f) = NaN;            
-    end
-n = n + 1; 
-end
-
-
-plot(SSDRequired, mean(NoStopScatterploYRequired(NoSigMinusSigResp, 'r', 'LineWidth', 4)
-xlabel('SSD')
-ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
+% n = 1; 
+% for o=min(SSDRequired):50:max(SSDRequired)
+%     meanNoStopScatterplotYRequired(o) = nanmean(NoStopScatterplotYRequired(n, :));
+%     meanNoStopScatterplotXRequired(o) = nanmean(NoStopScatterplotXRequired(n, :));
+%     meanSigRespScatterplotYRequired(o) = nanmean(SigRespScatterplotYRequired(n, :));
+%     meanSigRespScatterplotXRequired(o) = nanmean(SigRespScatterplotXRequired(n, :));
+%     if(isnan(NoStopOutput(SigRespCountCutoff, h, f))) == 0;
+%         SigRespScatterplotY(h, f) = (nanmean(SigRespOutput(:, h, f)));
+%         SigRespScatterplotX(h, f) = g;
+%         NoStopScatterplotY(h, f) = (nanmean(NoStopOutput(:, h, f)));
+%         NoStopScatterplotX(h, f) = g;
+%     else
+%         SigRespScatterplotY(h, f) = NaN;
+%         SigRespScatterplotX(h, f) = NaN;
+%         NoStopScatterplotY(h, f) = NaN;
+%         NoStopScatterplotX(h, f) = NaN;            
+%     end
+% n = n + 1; 
+% end
+% 
+% 
+% plot(SSDRequired, mean(NoStopScatterploYRequired(NoSigMinusSigResp, 'r', 'LineWidth', 4)
+% xlabel('SSD')
+% ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
 
 SortedSigRespOutput = sort(SigRespOutput, 1);
 SortedNoStopOutput = sort(NoStopOutput, 1); 
