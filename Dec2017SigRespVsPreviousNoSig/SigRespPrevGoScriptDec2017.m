@@ -17,7 +17,6 @@ NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kl
 [SubjectNum] = textread('TurkN339.txt', '%f'); % can load in a subset of subject numbers here, as is necessary for our
 % Turk data
 SSDRequired = [150 200 250 300]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
-SSDReqMax = 300;
 
 NoStopOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
 SigRespOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
@@ -121,12 +120,37 @@ xlabel('SSD')
 ylabel('RT (blue=individualSF, red=meanSF, green=precedingNS)')
 
 figure;
-for f=1:(size(SubjectNum, 1))
-    if(ismember(SSDRequired(1), NoStopScatterplotXRequired(:, f)));
-        scatter(NoStopScatterplotXRequired(:, f), (NoStopScatterplotYRequired(:, f) - (SigRespScatterplotYRequired(:, f))), 'b')
+for m=1:(size(SubjectNum, 1))
+    if(ismember(SSDRequired(1), NoStopScatterplotXRequired(:, m)));
+        scatter(NoStopScatterplotXRequired(:, m), (NoStopScatterplotYRequired(:, m) - (SigRespScatterplotYRequired(:, m))), 'b')
     hold on; 
     end
 end
+
+n = 1; 
+for o=min(SSDRequired):50:max(SSDRequired)
+    meanNoStopScatterplotYRequired(o) = nanmean(NoStopScatterplotYRequired(n, :));
+    meanNoStopScatterplotXRequired(o) = nanmean(NoStopScatterplotXRequired(n, :));
+    meanSigRespScatterplotYRequired(o) = nanmean(SigRespScatterplotYRequired(n, :));
+    meanSigRespScatterplotXRequired(o) = nanmean(SigRespScatterplotXRequired(n, :));
+    if(isnan(NoStopOutput(SigRespCountCutoff, h, f))) == 0;
+        SigRespScatterplotY(h, f) = (nanmean(SigRespOutput(:, h, f)));
+        SigRespScatterplotX(h, f) = g;
+        NoStopScatterplotY(h, f) = (nanmean(NoStopOutput(:, h, f)));
+        NoStopScatterplotX(h, f) = g;
+    else
+        SigRespScatterplotY(h, f) = NaN;
+        SigRespScatterplotX(h, f) = NaN;
+        NoStopScatterplotY(h, f) = NaN;
+        NoStopScatterplotX(h, f) = NaN;            
+    end
+n = n + 1; 
+end
+
+
+plot(SSDRequired, mean(NoStopScatterploYRequired(NoSigMinusSigResp, 'r', 'LineWidth', 4)
+xlabel('SSD')
+ylabel('PrecedingNoStopRT-StopFailRT (red=average)')
 
 SortedSigRespOutput = sort(SigRespOutput, 1);
 SortedNoStopOutput = sort(NoStopOutput, 1); 
