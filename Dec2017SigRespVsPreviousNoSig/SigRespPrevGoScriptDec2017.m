@@ -120,5 +120,13 @@ plot(OnlySSDsUsedForAverage(:, 1), meanNoStopScatterplotY, 'g', 'LineWidth', 4)
 xlabel('SSD')
 ylabel('RT (blue=individualSF, red=meanSF, green=precedingNS)')
 
+figure;
+for f=1:(size(SubjectNum, 1))
+    if(ismember(SSDRequired(1), NoStopScatterplotXRequired(:, f)));
+        scatter(NoStopScatterplotXRequired(:, f), (NoStopScatterplotYRequired(:, f) - (SigRespScatterplotYRequired(:, f))), 'b')
+    hold on; 
+    end
+end
+
 SortedSigRespOutput = sort(SigRespOutput, 1);
 SortedNoStopOutput = sort(NoStopOutput, 1); 
