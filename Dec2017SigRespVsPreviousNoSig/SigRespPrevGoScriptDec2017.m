@@ -6,7 +6,7 @@ clear all
 [SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsTurkSimpleHigh.txt', '%f%f%f%f%f');
 
 SigRespCountCutoff = 3; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
-MinimumSubjectsForAverage = 3; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
+MinimumSubjectsForAverage = 1; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
 
 %Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
 %the SSD distribution
@@ -61,7 +61,10 @@ for f=1:(size(SubjectNum, 1))
     end
 end
 
-
+SigRespScatterplotYRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
+SigRespScatterplotXRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
+NoStopScatterplotYRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
+NoStopScatterplotXRequired = zeros(NumberOfSSDs, size(SubjectNum, 1));
 
 for j=1:(size(SubjectNum, 1))
     if(mean(ismember(SSDRequired(:), NoStopScatterplotX(:, j))) == 1);
@@ -75,7 +78,6 @@ for j=1:(size(SubjectNum, 1))
         NoStopScatterplotYRequired(:, j) = NaN;
         NoStopScatterplotXRequired(:, j) = NaN;           
     end
-    h = h + 1; 
 end
 
 
