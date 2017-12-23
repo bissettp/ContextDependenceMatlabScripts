@@ -5,8 +5,8 @@ clear all
 %below the SSD min (I usually use -500). This kludge seems to work
 [SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsTurkMotorSelec.txt', '%f%f%f%f%f');
 
-SigRespCountCutoff = 1; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
-MinimumSubjectsForAverage = 1; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
+SigRespCountCutoff = 2; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
+MinimumSubjectsForAverage = 2; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
 
 %Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
 %the SSD distribution
@@ -19,19 +19,19 @@ NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kl
 SSDRequired = [150 200 250 300]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
 SSDIncrement = 50; %incremental difference between each SSD
 
+v = 1; 
 for t=SSDMin:SSDIncrement:SSDMax
-    v = 1; 
-    for u=SSDRequired:SSDIncrement:SSDMax
-        w = 1; 
+    w = 1; 
+    for u=min(SSDRequired):SSDIncrement:max(SSDRequired)
         if(u==t)
-            SSDRequiredIndices(w) = u; 
+            SSDRequiredIndices(w) = v; 
         end
         w = w + 1; 
     end
     v = v + 1;
 end
         
-SSDRequiredIndices = [12 13 14 15]; % index of the SSD required in an array from SSDMin to SSDMax
+%SSDRequiredIndices = [12 13 14 15]; % index of the SSD required in an array from SSDMin to SSDMax
 
 NoStopOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
 SigRespOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
