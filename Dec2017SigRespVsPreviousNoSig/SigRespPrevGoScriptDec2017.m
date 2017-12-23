@@ -17,7 +17,6 @@ NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kl
 [SubjectNum] = textread('TurkN339.txt', '%f'); % can load in a subset of subject numbers here, as is necessary for our
 % Turk data
 SSDRequired = [150 200 250 300]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
-SSDReqMax = 300;
 
 NoStopOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
 SigRespOutput = zeros(1, NumberOfSSDs, size(SubjectNum, 1));
@@ -127,6 +126,9 @@ for f=1:(size(SubjectNum, 1))
     hold on; 
     end
 end
+
+%plot((nanmean(SigRespScatterplotXRequired(4:7, :), 2)), (nanmean(SigRespScatterplotYRequired(4:7, :), 2)), 'r', 'LineWidth', 4);
+plot((nanmean(SigRespScatterplotXRequired(4:7, :), 2)), ((nanmean(NoStopScatterplotYRequired(4:7, :), 2)) - (nanmean(SigRespScatterplotYRequired(4:7, :), 2))), 'r', 'LineWidth', 4);
 
 SortedSigRespOutput = sort(SigRespOutput, 1);
 SortedNoStopOutput = sort(NoStopOutput, 1); 
