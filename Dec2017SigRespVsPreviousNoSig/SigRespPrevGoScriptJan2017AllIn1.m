@@ -3,20 +3,20 @@ clear all
 %Subject number in first column, block number in 2nd column, go RT in 3rd
 %column, SSD in 4th column, sig-resp RT in 5th column. Replace non-numbers in columns 3, 4, and 5 with a number
 %below the SSD min (I usually use -500). This kludge seems to work
-[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsWithinSubjModalityVis1.txt', '%f%f%f%f%f');
+[SubjectSeq Block GoRTSeq SSDSeq SigRespRT] = textread('SequentialRTsSSDsSimpleStop2Hours.txt', '%f%f%f%f%f');
 
-SigRespCountCutoff = 3; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
-MinimumSubjectsForAverage = 3; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
+SigRespCountCutoff = 2; %Threshold for the number of signal-respond trials at a specific SSD for that subject to be computed
+MinimumSubjectsForAverage = 5; %Threshold for the number of subjects that pass the SigRespCountCutoff at that SSD for that SSD to be included in the group average
 
 %Could hardcode SSDMin or SSDMax if you only want to evaluate a subset of
 %the SSD distribution
-SSDMin = min(SSDSeq(SSDSeq > -500)); %change to a number below the minimum SSD
+SSDMin = min(SSDSeq(SSDSeq > -500)); %change -500 to a number below the minimum SSD
 SSDMax = max(SSDSeq);
 NumberOfSSDs = size(unique(SSDSeq), 1)-1; %last -1 is to account for the -500 kludge mentioned above 
 SubjectNum = unique(SubjectSeq); %create a list of unique subject numbers
 %[SubjectNum] = textread('TurkN339.txt', '%f'); % can load in a subset of subject numbers here, as is necessary for our
 % Turk data
-SSDRequired = [150 200 250 300]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
+SSDRequired = [0 50 100 150 200 250 300 350 400 450 500]; % use this to look only at subjects who pass the SigRespCountCutoff on these SSDs
 SSDIncrement = 50; %incremental difference between each SSD
 
 v = 1; 
